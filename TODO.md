@@ -1,1 +1,1 @@
-- Processing goban board position
+- Processing pyhsical goban board position

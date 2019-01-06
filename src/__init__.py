@@ -1,1 +1,4 @@
-from .mouse_actions import get_goban_corners, str_to_integer_coordinates, int_coords_to_screen_coordinates, make_the_move
+from .mouse_actions import get_goban_corners, str_to_integer_coordinates
+from .mouse_actions import int_coords_to_screen_coordinates, make_the_move
+from .mouse_actions import int_coords_to_str
+from .screenshot_actions import KGS_goban_grayscale, get_goban_state
