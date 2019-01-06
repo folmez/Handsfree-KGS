@@ -6,3 +6,7 @@ This projects aims to fulfill one of my dreams, playing GO on a pyhsical board a
 With this project, after a game begins on KGS, I will play my move and the computer's webcam will figure out what move I played which will then automaticall place my stone by manipulating the mouse and click at the exact spot I played.
 
 There maybe an another component added to this project in the future, a physical arm, that will take inputs from the computer and actually play my opponents moves on the board :))
+
+TESTING
+
+An empty Goban must be open on the screen for proper testing

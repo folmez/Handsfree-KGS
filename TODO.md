@@ -1,0 +1,1 @@
+- Processing goban board position
