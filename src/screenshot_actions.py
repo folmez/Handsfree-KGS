@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import src
 
-def get_goban_state(rgb_pix, plot_stuff=False):
+def get_digital_goban_state(rgb_pix, plot_stuff=False):
     # RGB of Black = [  0,   0,   0]
     # RGB of White = [255, 255, 255]
     # RGB of Orange = [255, 160, 16]
@@ -41,14 +41,14 @@ def get_goban_state(rgb_pix, plot_stuff=False):
             mat = rgb_pix[:,:,0]
             color = np.mean(np.mean(mat[i:i+d+1, j:j+d+1]))
             if color < 125:
-                stones.add((1, posi, posj)) # black stone
+                stones.add((1, posj, posi)) # black stone
                 rgb_pix[i-d+1:i+d, j-d+1:j+d, :] = 0
 
             # Find white stones
             mat = rgb_pix[:,:,2]
             color = np.mean(np.mean(mat[i:i+d+1, j:j+d+1]))
             if color > 125:
-                stones.add((2, posi, posj)) # white stone
+                stones.add((2, posj, posi)) # white stone
                 rgb_pix[i-d+1:i+d, j-d+1:j+d] = 255
 
     # Plot for debugging
@@ -58,7 +58,7 @@ def get_goban_state(rgb_pix, plot_stuff=False):
 
     return stones
 
-def KGS_goban_grayscale(UL_x, UL_y, goban_step):
+def KGS_goban_rgb_screenshot(UL_x, UL_y, goban_step):
     UL_outer_x = UL_x - 0.5*goban_step
     UL_outer_y = UL_y - 0.5*goban_step
     BR_outer_x = UL_x + 18*goban_step  + 0.5*goban_step

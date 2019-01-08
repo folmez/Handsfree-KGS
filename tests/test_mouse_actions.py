@@ -40,4 +40,4 @@ def test_place_stones_on_all_stars():
         src.make_the_move(mouse, x, y)
 
     # Get KGS goban as a square grayscale
-    rgb_pix = src.KGS_goban_grayscale(UL_x, UL_y, goban_step)
+    rgb_pix = src.KGS_goban_rgb_screenshot(UL_x, UL_y, goban_step)
