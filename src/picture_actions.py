@@ -134,6 +134,7 @@ def calibrate(rgb, x_idx, y_idx, bxy=[], wxy=[]):
     RMAX = 0
     for j,i in bxy:
         RGB = src.average_RGB(rgb, xMAX, yMAX, x_idx[i-1], y_idx[j-1], roll_w)
+        print(f"Black stone at ({i},{j}) with RGB = ", RGB)
         RMAX = np.maximum(RMAX, RGB[0])
 
     # Find the min red scale of the rest to distinguish
@@ -170,6 +171,7 @@ def calibrate(rgb, x_idx, y_idx, bxy=[], wxy=[]):
     BMIN = 255
     for (j,i) in wxy:
         RGB = src.average_RGB(rgb, xMAX, yMAX, x_idx[i-1], y_idx[j-1], roll_w)
+        print(f"White stone at ({i},{j}) with RGB = ", RGB)
         BMIN = np.minimum(BMIN, RGB[2])
 
     # Find the max blue scale of the rest to distinguis
