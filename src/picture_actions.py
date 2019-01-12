@@ -1,10 +1,71 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.signal import argrelmin
+import imageio
 import src
 
-def is_there_a_stone_at_this_position(x,y):
-    pass
+
+def play_next_move_on_digital_board(mouse, color, i, j, bxy, wxy, \
+                                                UL_x, UL_y, goban_step):
+    if color is not None:
+        print(f"New move: {color} played at {convert_physical_board_ij_to_str(i,j)}")
+        if color is 'black':
+            bxy.append((i,j))
+        elif color is 'white':
+            wxy.append((i,j))
+        # make the move
+        x, y = src.int_coords_to_screen_coordinates(UL_x, UL_y, i, j, goban_step)
+        src.make_the_move(mouse, x, y)
+    return bxy, wxy
+
+def convert_physical_board_ij_to_str(i,j):
+    """
+    The pyhsical board will have the upper-left corner labeled as (1,1) and the
+    bottom-right corner labeled as (19,19). This little script will help translate
+    and correct and misalignment between the here-described labeling and the
+    algorithm.
+    """
+    return f"({i},{j})"
+
+def scan_next_move(img_name, ob, x_idx, y_idx, red_scale_th, blue_scale_th, \
+                    bxy, wxy, plot_stuff=False):
+    rgb = imageio.imread(img_name)
+    rgb = src.rescale_pyhsical_goban_rgb(rgb, ob)
+    bxy_new, wxy_new = src.mark_stones(rgb, x_idx, y_idx, \
+                            red_scale_th, blue_scale_th, plot_stuff=plot_stuff)
+    print(bxy ,wxy, bxy_new, wxy_new)
+    if set(bxy_new) == set(bxy) and set(wxy_new) == set(wxy):
+        color, i, j = None, None, None
+        print('No new moves')
+    elif len(set(bxy_new)-set(bxy)) == 1 and set(wxy_new) == set(wxy):
+        color = 'black'
+        [(i,j)] = list(set(bxy_new)-set(bxy))
+    elif len(set(wxy_new)-set(wxy)) == 1 and set(bxy_new) == set(bxy):
+        color = 'white'
+        [(i,j)] = list(set(wxy_new)-set(wxy))
+    else:
+        raise ValueError('Move scanner error!')
+
+    return color, i, j
+
+BOARD_CORNERS = []
+def onclick(event):
+    print(event.xdata, event.ydata)
+    BOARD_CORNERS.append((event.xdata, event.ydata))
+def get_pyhsical_board_outer_corners(img_name):
+    rgb = imageio.imread(img_name)
+    fig = plt.figure()
+    plt.imshow(rgb)
+    plt.title("Please click on UL-UR-BL-BR corners or close plot...")
+    fig.canvas.mpl_connect('button_press_event', onclick)
+    plt.show()
+    UL_outer_x, UL_outer_y = BOARD_CORNERS[0]
+    UR_outer_x, UR_outer_y = BOARD_CORNERS[1]
+    BL_outer_x, BL_outer_y = BOARD_CORNERS[2]
+    BR_outer_x, BR_outer_y = BOARD_CORNERS[3]
+
+    return UL_outer_x, UL_outer_y, UR_outer_x, UR_outer_y, \
+            BL_outer_x, BL_outer_y, BR_outer_x, BR_outer_y
 
 def find_board_points(rgb, plot_stuff=False):
     """
@@ -50,9 +111,12 @@ def find_board_points(rgb, plot_stuff=False):
 
     return x_idx, y_idx
 
-def rescale_pyhsical_goban_rgb(rgb, \
-                            UL_outer_x, UL_outer_y, UR_outer_x, UR_outer_y, \
-                            BL_outer_x, BL_outer_y, BR_outer_x, BR_outer_y):
+def rescale_pyhsical_goban_rgb(rgb, ob):
+
+    # Get outer boundaries from ob
+    UL_outer_x, UL_outer_y, UR_outer_x, UR_outer_y, \
+    BL_outer_x, BL_outer_y, BR_outer_x, BR_outer_y = ob
+
     # Rescale to n by n matrix
     n = 300
 
@@ -192,20 +256,30 @@ def calibrate(rgb, x_idx, y_idx, bxy=[], wxy=[]):
     return red_scale_th, blue_scale_th
 
 def is_this_stone_on_the_board(rgb, x_idx, y_idx, red_scale_th, blue_scale_th, \
-                                    color, i, j):
+                                    color, i, j, plot_stuff=False):
     i,j = j,i # RGB matrix is messed up so this needs to be done
+    x, y = x_idx[i-1], y_idx[j-1]
+    if plot_stuff:
+        fig = plt.figure()
+        plt.imshow(rgb)
+        plt.ylabel('1st index = 1, ..., 19')
+        plt.xlabel('2nd index = 1, ..., 19')
+        plt.title(f"Checking if there is a {color} stone at ({j},{i})")
+        plt.plot(x, y, 'ro', markersize=20, fillstyle='none')
+        plt.show()
+
     xMAX, yMAX, _ = rgb.shape
     roll_w = int(np.round(0.01*xMAX))
-    x, y = x_idx[i-1], y_idx[j-1]
     xL, xR = np.maximum(0, x-roll_w), np.minimum(x+roll_w+1, xMAX-1)
     yL, yR = np.maximum(0, y-roll_w), np.minimum(y+roll_w+1, yMAX-1)
     red_scale = np.mean(np.mean(rgb[yL:yR, xL:xR, 0]))
     blue_scale = np.mean(np.mean(rgb[yL:yR, xL:xR, 2]))
+    msg = f"There is {color} stone at {src.int_coords_to_str(i,j)} = ({i},{j})"
     if color == 'black' and red_scale < red_scale_th:
-        print(f"There is black stone at {src.int_coords_to_str(i,j)} = ({i},{j})")
+        print(msg)
         return True
     elif color == 'white' and blue_scale > blue_scale_th:
-        print(f"There is white stone at {src.int_coords_to_str(i,j)} = ({i},{j})")
+        print(msg)
         return True
     else:
         return False

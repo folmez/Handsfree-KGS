@@ -8,3 +8,6 @@ from .picture_actions import rolling_sum, find_custom_local_minima
 from .picture_actions import mark_board_points, is_this_stone_on_the_board
 from .picture_actions import mark_stones, calibrate
 from .picture_actions import find_board_points, rescale_pyhsical_goban_rgb
+from .picture_actions import get_pyhsical_board_outer_corners
+from .picture_actions import convert_physical_board_ij_to_str
+from .picture_actions import play_next_move_on_digital_board, scan_next_move

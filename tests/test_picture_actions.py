@@ -1,3 +1,4 @@
+import pytest
 import imageio
 import sys, os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -27,6 +28,13 @@ UL_outer_x4, UL_outer_y4 = 414, 256
 UR_outer_x4, UR_outer_y4 = 962, 269
 BL_outer_x4, BL_outer_y4 = 217, 659
 BR_outer_x4, BR_outer_y4 = 1211, 679
+
+@pytest.mark.skip
+def test_board_outer_corner():
+    UL_outer_x0_click, UL_outer_y0_click, _, _, _, _, _, _ = \
+        src.get_pyhsical_board_outer_corners(IMG_PATH[0])
+    assert abs(UL_outer_x0_click - UL_outer_x0) < 5 # five pixels
+    assert abs(UL_outer_y0_click - UL_outer_y0) < 5
 
 def test_board_state_detection_from_camera_picture():
     assert_board_state(IMG_PATH[4], bxy4, wxy4, 'black', bxy4[0], \
@@ -72,4 +80,5 @@ def assert_board_state(IMG_PATH, bxy, wxy, color, ij_pair, \
     assert set(bxy) == set(bxy_new)
     assert set(wxy) == set(wxy_new)
     assert src.is_this_stone_on_the_board(rgb, x_idx, y_idx, \
-                    red_scale_th, blue_scale_th, color, ij_pair[0], ij_pair[1])
+                red_scale_th, blue_scale_th, color, ij_pair[0], ij_pair[1], \
+                plot_stuff=True)

@@ -25,12 +25,13 @@ def get_goban_corners():
 
     return UL_x, UL_y, goban_step
 
-def make_the_move(mouse, x, y):
+def make_the_move(mouse, x, y, no_click=False):
     (cx, cy) = mouse.position
     time.sleep(0.5)
     mouse.move(x - cx, y - cy)
     time.sleep(0.2)
-    mouse.click(Button.left, 1)
+    if not no_click:
+        mouse.click(Button.left, 1)
 
 def int_coords_to_screen_coordinates(UL_x, UL_y, i, j, goban_step):
     x = UL_x + (i-1) * goban_step
